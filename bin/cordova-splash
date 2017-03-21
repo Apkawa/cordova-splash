@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-require('./../index.js').main();
+require('./../lib/index.js').main();

@@ -1,11 +1,10 @@
-'use strict';
-var assert = require('assert');
+'use strict'
+import assert from 'assert'
+import { collectPlatformsFromConfig } from '../src/'
 
-var collectPlatformsFromConfig = require('../index').collectPlatformsFromConfig;
-
-describe('index', function () {
-  describe('collectPlatformsFromConfig', function () {
-    it('generic', function () {
+describe('index', () => {
+  describe('collectPlatformsFromConfig', () => {
+    it('generic', () => {
       collectPlatformsFromConfig('/home/apkawa/work/u24-mobile-app/U24App/config.xml')
         .then(function (result) {
           assert(result['ios'])
@@ -14,7 +13,6 @@ describe('index', function () {
           assert(0, err)
 
         })
-
-    });
-  });
-});
+    })
+  })
+})

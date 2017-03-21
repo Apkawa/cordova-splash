@@ -8,7 +8,10 @@
     "bin": "./bin"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha --compilers js:babel-core/register",
+    "build": "babel --out-dir lib src",
+    "watch": "babel --watch --out-dir lib src",
+    "lint": "eslint src --fix"
   },
   "repository": {
     "type": "git",
@@ -37,6 +40,15 @@
     "xml2js": "^0.4.3"
   },
   "devDependencies": {
+    "babel-core": "^6.24.0",
+    "babel-eslint": "^7.2.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.24.0",
+    "babel-preset-stage-0": "^6.22.0",
+    "eslint": "^3.18.0",
+    "eslint-config-airbnb": "^14.1.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^4.0.0",
+    "eslint-plugin-react": "^6.10.3",
     "mocha": "^3.2.0"
   }
 }
