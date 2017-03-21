@@ -28,10 +28,18 @@ If you run a old version of Cordova for iOS and you need your files in `/Resourc
 
     $ cordova-splash --xcode-old
 
+#### Extra options:
+
+* `--ios` - build only ios. default: `false`
+* `--android` - build only android . default: `false`
+* `--9-patch` - generate nine-patch images *.9.png*. default: `false`
+* `--9-patch-width` - set width border by percent, must be < 1. default: `0.25`
+* `--9-patch-height` - set height border by percent, must be < 1. default: `0.25`
+* `--update-config` - update images from `<splash src.../>`. default: `false`
+
 #### Notes:
 
-- Your `config.ml` file will not be updated by the tool (because images are automatically created in the good folders)
-- Therefore, in your `config.xml`, be sure to remove all lines looking like `<splash src="res/screen/android/splash-land-mdpi.png" density="land-mdpi"/>`
+- Your `config.xml` file will not be updated by the tool (because images are automatically created in the good folders)
 
 ### Icons
 

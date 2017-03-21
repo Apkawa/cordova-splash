@@ -20,6 +20,8 @@ settings.IOS = argv.ios || false;
 settings.ANDROID = argv.android || false;
 settings.ALL_PLATFORMS = !settings.IOS && !settings.ANDROID;
 settings.PATCH_9 = argv['9-patch'] || false;
+settings.PATCH_9_WIDTH = parseFloat(argv['9-patch-width'] || 0.25);
+settings.PATCH_9_HEIGHT = parseFloat(argv['9-patch-height'] || 0.25);
 settings.UPDATE_CONFIG_RESOURCES = argv['update-config'] || false;
 settings.OLD_XCODE_PATH = argv['xcode-old'] || false;
 
@@ -233,43 +235,63 @@ var generateSplash = function (platform, splash) {
   if (!fs.existsSync(dst)) {
     fs.mkdirsSync(dst);
   }
-  ig.crop({
-    srcPath: srcPath,
-    dstPath: dstPath,
-    quality: 1,
-    format: 'png',
-    width: splash.width,
-    height: splash.height
-  }, function (err, stdout, stderr) {
+  ig.identify(srcPath, function (err, srcInfo) {
     if (err) {
       deferred.reject(err);
-    } else {
-      deferred.resolve();
-      display.success(splash.name + ' created');
     }
-  });
-  if (has9Patch || settings.PATCH_9) {
-    // TODO from source size
-    var y_border = ((splash.height * 1024) / 2048) / 2;
-    var x_border = ((splash.width * 1024) / 2048) / 2;
-    var convert_args = [
-      '-background',
-      'white',
-      '-bordercolor',
-      'white',
-      dstPath,
-      '-border', '1',
-      '-fill', 'black',
-      '-draw', 'line 1,0 ' + x_border + ',0',
-      '-draw', 'line ' + (splash.width - x_border) + ',0 ' + splash.width + ',0',
+    ig.crop({
+      srcPath: srcPath,
+      dstPath: dstPath,
+      quality: 1,
+      format: 'png',
+      width: splash.width,
+      height: splash.height
+    }, function (err, stdout, stderr) {
+      if (err) {
+        deferred.reject(err);
+      } else {
+        if (platform.name == 'android' && (has9Patch || settings.PATCH_9)) {
+          // TODO from source size
+          var new_size = Math.max.apply(null, [splash.width, splash.height]);
+          var ratio = splash.width / splash.height;
 
-      '-draw', 'line 0,1 ' + ' 0,' + y_border,
-      '-draw', 'line 0,' + (splash.height - y_border) + ' 0,' + splash.height,
-      dstPath.replace(/\.png$/, '.9.png')
-    ];
-    console.log(convert_args);
-    ig.convert(convert_args);
-  }
+          var base_border = ((srcInfo.height * 0.25) * new_size) / srcInfo.height
+
+          var y_border = ((srcInfo.height * settings.PATCH_9_HEIGHT) * new_size) / srcInfo.height;
+          var x_border = ((srcInfo.width * settings.PATCH_9_WIDTH) * new_size) / srcInfo.width;
+
+          if (ratio < 1) {
+            x_border = (base_border - y_border) * ratio;
+          } else {
+            y_border = (base_border - x_border) * ratio;
+          }
+
+          y_border = Math.round(y_border)
+          x_border = Math.round(x_border)
+
+          var convert_args = [
+            '-background',
+            'white',
+            '-bordercolor',
+            'white',
+            dstPath,
+            '-border', '1',
+            '-fill', 'black',
+            '-draw', 'line 1,0 ' + x_border + ',0',
+            '-draw', 'line ' + (splash.width - x_border) + ',0 ' + splash.width + ',0',
+
+            '-draw', 'line 0,1 ' + ' 0,' + y_border,
+            '-draw', 'line 0,' + (splash.height - y_border) + ' 0,' + splash.height,
+            dstPath.replace(/\.png$/, '.9.png')
+          ];
+          ig.convert(convert_args);
+        }
+        deferred.resolve();
+        display.success(splash.name + ' created');
+      }
+    });
+
+  })
   return deferred.promise;
 };
 
